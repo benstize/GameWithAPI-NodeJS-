@@ -2,6 +2,7 @@ const responseMiddleware = (req, res, next) => {
   // TODO: Implement middleware that returns result of the query
   try {
     const { error, message, ...rest } = req.body;
+
     if (error) {
       throw new Error(message);
     }
@@ -9,9 +10,10 @@ const responseMiddleware = (req, res, next) => {
       ...rest,
     });
   } catch ({ message }) {
-    res.status(404).json({
+    res.status(req.body.errorNumber || 400).json({
       error: true,
       message: message,
+
     });
   } finally {
     next();

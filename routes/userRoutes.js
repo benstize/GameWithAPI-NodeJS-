@@ -11,23 +11,123 @@ const router = Router();
 router.get(
   "/",
   (req, res, next) => {
-    try {
-      const result = userService.getAllUsers();
-      if (!result) throw new Error();
-      req.body = result;
-      console.log(result)
-      res.status(200).send(req.body);
-    } catch ({ message }) {
-      res.status(404).send({
-        error: true,
-        message,
-      });
-    } finally {
-      next();
+
+    const users = userService.getAllUsers();
+    if (!users) {
+      req.body.error = true;
+      req.body.message = "No one user is registred"
     }
+    req.body = users;
+
+
+    next();
+
   },
   responseMiddleware
 );
-router.get("/:id", userService.getOneUser, responseMiddleware);
 
+
+router.get("/:id", (req, res, next) => {
+
+  const id = req.params.id;
+  const user = userService.getOneUser({ id });
+  console.log(user)
+  if (!user) {
+    req.body.error = true;
+    req.body.message = "User not found"
+  } else {
+    req.body = user;
+  }
+  next();
+
+}, responseMiddleware);
+
+
+router.post(
+  "/",
+  createUserValid,
+  (req, res, next) => {
+    if (req.body.error) {
+      return next();
+    }
+
+    const { email, phoneNumber } = req.body;
+    const IsEmailExist = userService.getOneUser({
+      email,
+    });
+    const isPhoneExist = userService.getOneUser({
+      phoneNumber,
+    });
+
+    if (IsEmailExist || isPhoneExist) {
+      req.body.error = true;
+      req.body.message = "User is already exist"
+      return next();
+    }
+
+    const user = userService.createUser(req.body);
+    if (!user) {
+      req.body.error = true;
+      req.errorNumber = 404;
+      req.body.message = "User is not found"
+
+    }
+    req.body = user;
+    next();
+  },
+  responseMiddleware
+);
+
+router.put(
+  "/:id",
+  updateUserValid,
+  (req, res, next) => {
+
+    if (req.body.error) {
+      return next();
+    }
+    const { id } = req.params;
+    const { email, phoneNumber } = req.body;
+    const IsEmailExist = userService.getOneUser({
+      email,
+    });
+    const isPhoneExist = userService.getOneUser({
+      phoneNumber,
+    });
+
+    if (IsEmailExist || isPhoneExist) {
+      req.body.error = true;
+      req.body.message = "User is already exist"
+      return next();
+    }
+    const user = userService.updateUser(id, req.body);
+    if (!user) {
+      console.log("!user")
+      req.body.error = true;
+      req.body.errorNumber = 404;
+      req.body.message = "User is not found"
+      return next();
+    }
+    req.body = user;
+    delete req.body.password;
+    next();
+
+  },
+  responseMiddleware
+);
+
+
+
+router.delete("/:id", (req, res, next) => {
+  const id = req.params.id;
+  const user = userService.removeUser(id)
+  if (!user) {
+    req.body.error = true;
+    req.body.message = "User is not found"
+    return next();
+  }
+  req.body = user;
+  next();
+
+}, responseMiddleware)
 export { router };

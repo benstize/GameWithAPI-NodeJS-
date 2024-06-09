@@ -1,3 +1,4 @@
+import { USER } from "../models/user.js";
 import { userRepository } from "../repositories/userRepository.js";
 
 class UserService {
@@ -19,16 +20,22 @@ class UserService {
     return users;
   }
 
-  getOneUser(id) {
-    const user = userRepository.getOne(id);
+  getOneUser(search) {
+    const user = userRepository.getOne(search);
     if (!user) {
       return null;
     }
     return user;
   }
 
+
+
   createUser(data) {
-    const createUser = userRepository.create(data);
+    for (const key in USER) {
+      USER[key] = data[key];
+    }
+
+    const createUser = userRepository.create(USER);
     if (!createUser) {
       return null;
     }
@@ -36,6 +43,11 @@ class UserService {
   }
 
   updateUser(id, data) {
+    const user = userRepository.getOne({ id })
+
+    if (!user || !data) {
+      return null
+    }
     const updatedUser = userRepository.update(id, data);
     if (!updatedUser) {
       return null;
