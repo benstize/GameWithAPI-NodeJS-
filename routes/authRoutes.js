@@ -17,8 +17,6 @@ router.post(
       req.body.message = "User does not exist"
       return next();
     }
-    req.body = isEmailRight;
-    req.body.password = "";
     next();
   },
   responseMiddleware

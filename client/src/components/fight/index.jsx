@@ -15,14 +15,26 @@ class Fight extends React.Component {
     };
 
     async componentDidMount() {
-        const fighters = await getFighters();
-        if(fighters && !fighters.error) {
-            this.setState({ fighters });
+        try {
+            const fighters = await getFighters();
+            console.log('Fetched fighters:', fighters);
+            if (fighters && !fighters.error) {
+                this.setState({ fighters });
+            } else {
+                console.error('Error fetching fighters:', fighters.error);
+            }
+        } catch (error) {
+            console.error('Error fetching fighters:', error);
         }
     }
 
     onFightStart = () => {
-        
+        const { fighter1, fighter2 } = this.state;
+        if (fighter1 && fighter2) {
+            
+        } else {
+            console.warn('Both fighters must be selected to start a fight');
+        }
     }
 
     onCreate = (fighter) => {
@@ -30,16 +42,16 @@ class Fight extends React.Component {
     }
 
     onFighter1Select = (fighter1) => {
-        this.setState({fighter1 });
+        this.setState({ fighter1 });
     }
 
     onFighter2Select = (fighter2) => {
-        this.setState({ fighter2 });
+        this.setState({ fighter2 });
     }
 
     getFighter1List = () => {
         const { fighter2, fighters } = this.state;
-        if(!fighter2) {
+        if (!fighter2) {
             return fighters;
         }
 
@@ -48,7 +60,7 @@ class Fight extends React.Component {
 
     getFighter2List = () => {
         const { fighter1, fighters } = this.state;
-        if(!fighter1) {
+        if (!fighter1) {
             return fighters;
         }
 
@@ -56,7 +68,7 @@ class Fight extends React.Component {
     }
 
     render() {
-        const  { fighter1, fighter2 } = this.state;
+        const { fighter1, fighter2 } = this.state;
         return (
             <div id="wrapper">
                 <NewFighter onCreated={this.onCreate} />
