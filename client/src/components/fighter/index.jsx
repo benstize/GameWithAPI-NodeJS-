@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormControl, InputLabel, makeStyles, Select } from '@material-ui/core';
 import { MenuItem } from 'material-ui';
 
@@ -12,13 +12,22 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Fighter({ fightersList, onFighterSelect, selectedFighter }) {
+export default function Fighter({ fightersList = [], onFighterSelect, selectedFighter }) {
     const classes = useStyles();
-    const [fighter, setFighter] = useState();
+    const [fighter, setFighter] = useState('');
+
+    useEffect(() => {
+        if (selectedFighter) {
+            setFighter(selectedFighter.id);
+        }
+        console.log(fightersList)
+    }, [selectedFighter, fightersList]);
 
     const handleChange = (event) => {
-        setFighter(event.target.value);
-        onFighterSelect(event.target.value);
+        const selectedId = event.target.value;
+        setFighter(selectedId);
+        const selectedFighter = fightersList.find(fighter => fighter.id === selectedId);
+        onFighterSelect(selectedFighter);
     };
 
     return (
@@ -31,21 +40,19 @@ export default function Fighter({ fightersList, onFighterSelect, selectedFighter
                     value={fighter}
                     onChange={handleChange}
                 >
-                    {fightersList.map((it, index) => {
-                        return (
-                            <MenuItem key={`${index}`} value={it}>{it.name}</MenuItem>
-                        );
-                    })}
+                    {Array.isArray(fightersList) && fightersList.map((it, index) => (
+                        <MenuItem key={it.id} value={it.id}>{it.name}</MenuItem>
+                    ))}
                 </Select>
-                {selectedFighter
-                    ? <div>
+                {selectedFighter && (
+                    <div>
                         <div>Name: {selectedFighter.name}</div>
                         <div>Power: {selectedFighter.power}</div>
                         <div>Defense: {selectedFighter.defense}</div>
                         <div>Health: {selectedFighter.health}</div>
                     </div>
-                    : null
-                }
+                )}
             </FormControl>
-        </div>)
+        </div>
+    );
 }

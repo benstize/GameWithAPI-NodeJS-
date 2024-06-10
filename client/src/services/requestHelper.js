@@ -5,6 +5,7 @@ export const get = async (entityName, id = '') => {
 }
 
 export const post = async (entityName, body) => {
+    console.log(body)
     return await makeRequest(entityName, 'POST', body);
 }
 
@@ -22,6 +23,10 @@ const makeRequest = async (path, method, body, fightLog = undefined) => {
 
         const user = localStorage.getItem('user');
         const logString = JSON.stringify(fightLog);
+
+        const headers = {
+            "Content-Type": "application/json"
+        };
         if (user) {
             headers['User'] = user;
         }
@@ -30,14 +35,11 @@ const makeRequest = async (path, method, body, fightLog = undefined) => {
             headers['Fight-lod'] = logString
         }
 
-        const headers = {
-            "Content-Type": "application/json"
-        };
 
         const res = await fetch(url, {
             method,
             body: body ? JSON.stringify(body) : undefined,
-
+            headers
         });
 
         const dataObj = await res.json();

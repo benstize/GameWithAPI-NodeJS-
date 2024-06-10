@@ -17,9 +17,9 @@ class Fight extends React.Component {
     async componentDidMount() {
         try {
             const fighters = await getFighters();
-            console.log('Fetched fighters:', fighters);
             if (fighters && !fighters.error) {
-                this.setState({ fighters });
+                const fightersArray = Object.values(fighters);
+                this.setState({ fighters: fightersArray });
             } else {
                 console.error('Error fetching fighters:', fighters.error);
             }
@@ -28,10 +28,12 @@ class Fight extends React.Component {
         }
     }
 
+
     onFightStart = () => {
         const { fighter1, fighter2 } = this.state;
         if (fighter1 && fighter2) {
             
+
         } else {
             console.warn('Both fighters must be selected to start a fight');
         }
@@ -54,9 +56,10 @@ class Fight extends React.Component {
         if (!fighter2) {
             return fighters;
         }
-
         return fighters.filter(it => it.id !== fighter2.id);
     }
+
+
 
     getFighter2List = () => {
         const { fighter1, fighters } = this.state;
@@ -73,11 +76,11 @@ class Fight extends React.Component {
             <div id="wrapper">
                 <NewFighter onCreated={this.onCreate} />
                 <div id="figh-wrapper">
-                    <Fighter selectedFighter={fighter1} onFighterSelect={this.onFighter1Select} fightersList={this.getFighter1List() || []} />
+                    <Fighter selectedFighter={fighter1} onFighterSelect={this.onFighter1Select} fightersList={this.getFighter1List()} />
                     <div className="btn-wrapper">
                         <Button onClick={this.onFightStart} variant="contained" color="primary">Start Fight</Button>
                     </div>
-                    <Fighter selectedFighter={fighter2} onFighterSelect={this.onFighter2Select} fightersList={this.getFighter2List() || []} />
+                    <Fighter selectedFighter={fighter2} onFighterSelect={this.onFighter2Select} fightersList={this.getFighter2List()} />
                 </div>
             </div>
         );

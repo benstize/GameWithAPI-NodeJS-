@@ -7,6 +7,7 @@ const router = Router();
 router.post(
   "/login",
   (req, res, next) => {
+    console.log('work', req.body.email)
     const { email, password } = req.body;
 
     const isEmailRight = authService.login({ email });
